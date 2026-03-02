@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="YouChat – Your AI-powered assistant for chat, code review, summarization, and quiz generation." />
+  <title>YouChat – AI Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── HEADER ── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">YouChat</span>
+        <span class="logo-badge">AI</span>
+      </div>
+      <p class="header-tagline">Powered by Ollama · Local AI</p>
+    </div>
+  </header>
+
+  <!-- ── TAB NAVIGATION ── -->
+  <nav class="tab-nav" role="tablist" aria-label="AI Features">
+    <button class="tab-btn active" id="tab-chat"     role="tab" aria-selected="true"  aria-controls="panel-chat"     data-tab="chat">
+      <span class="tab-icon">💬</span><span class="tab-label">Chat</span>
+    </button>
+    <button class="tab-btn"        id="tab-summarize" role="tab" aria-selected="false" aria-controls="panel-summarize" data-tab="summarize">
+      <span class="tab-icon">📝</span><span class="tab-label">Summarizer</span>
+    </button>
+    <button class="tab-btn"        id="tab-review"    role="tab" aria-selected="false" aria-controls="panel-review"    data-tab="review">
+      <span class="tab-icon">🔍</span><span class="tab-label">Code Review</span>
+    </button>
+    <button class="tab-btn"        id="tab-quiz"      role="tab" aria-selected="false" aria-controls="panel-quiz"      data-tab="quiz">
+      <span class="tab-icon">🧠</span><span class="tab-label">Quiz</span>
+    </button>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main-content">
+
+    <!-- ── 1. CHAT PANEL ── -->
+    <section id="panel-chat" class="panel active" role="tabpanel" aria-labelledby="tab-chat">
+      <div class="panel-header">
+        <h1 class="panel-title">💬 AI Chat</h1>
+        <p class="panel-desc">Have a friendly conversation, get daily tips, or ask anything.</p>
+      </div>
+
+      <div class="chat-window" id="chat-window" aria-live="polite" aria-label="Chat messages">
+        <div class="chat-welcome">
+          <div class="welcome-icon">🤖</div>
+          <p>Hi there! I'm your AI assistant. Ask me anything — tips, ideas, questions!</p>
+        </div>
+      </div>
+
+      <form class="chat-form" id="chat-form" autocomplete="off">
+        <div class="input-row">
+          <input
+            type="text"
+            id="chat-input"
+            class="text-input"
+            placeholder="Type your message..."
+            aria-label="Chat message"
+            required
+          />
+          <button type="submit" class="send-btn" id="chat-send-btn" aria-label="Send message">
+            <span class="btn-text">Send</span>
+            <span class="btn-icon">➤</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ── 2. SUMMARIZE PANEL ── -->
+    <section id="panel-summarize" class="panel" role="tabpanel" aria-labelledby="tab-summarize">
+      <div class="panel-header">
+        <h1 class="panel-title">📝 Code / Note Summarizer</h1>
+        <p class="panel-desc">Paste your notes or code and get a clean summary + 3 actionable suggestions.</p>
+      </div>
+
+      <form class="feature-form" id="summarize-form">
+        <div class="form-group">
+          <label class="form-label" for="summarize-notes">Your Notes</label>
+          <textarea
+            id="summarize-notes"
+            class="textarea-input"
+            placeholder="Paste your notes or code here..."
+            rows="8"
+            aria-label="Notes to summarize"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="primary-btn" id="summarize-btn">
+          <span class="btn-spinner hidden" aria-hidden="true"></span>
+          <span class="btn-label">Summarize</span>
+        </button>
+      </form>
+
+      <div class="result-area hidden" id="summarize-result">
+        <div class="result-card">
+          <h2 class="result-section-title">📋 Summary</h2>
+          <div class="result-text" id="summarize-summary-text"></div>
+        </div>
+        <div class="result-card accent">
+          <h2 class="result-section-title">✅ Suggestions</h2>
+          <div class="result-text" id="summarize-suggestions-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. CODE REVIEW PANEL ── -->
+    <section id="panel-review" class="panel" role="tabpanel" aria-labelledby="tab-review">
+      <div class="panel-header">
+        <h1 class="panel-title">🔍 Code Review</h1>
+        <p class="panel-desc">Get expert AI feedback, spotted issues, and improvement suggestions for your code.</p>
+      </div>
+
+      <form class="feature-form" id="review-form">
+        <div class="form-group">
+          <label class="form-label" for="review-language">Programming Language</label>
+          <select id="review-language" class="select-input" aria-label="Select programming language" required>
+            <option value="" disabled selected>Select a language…</option>
+            <option value="JavaScript">JavaScript</option>
+            <option value="TypeScript">TypeScript</option>
+            <option value="Python">Python</option>
+            <option value="Java">Java</option>
+            <option value="C">C</option>
+            <option value="C++">C++</option>
+            <option value="Go">Go</option>
+            <option value="Rust">Rust</option>
+            <option value="PHP">PHP</option>
+            <option value="Ruby">Ruby</option>
+            <option value="Kotlin">Kotlin</option>
+            <option value="Swift">Swift</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="review-code">Your Code</label>
+          <textarea
+            id="review-code"
+            class="textarea-input mono"
+            placeholder="Paste your code here..."
+            rows="10"
+            aria-label="Code to review"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="primary-btn" id="review-btn">
+          <span class="btn-spinner hidden" aria-hidden="true"></span>
+          <span class="btn-label">Review Code</span>
+        </button>
+      </form>
+
+      <div class="result-area hidden" id="review-result">
+        <div class="result-card">
+          <h2 class="result-section-title">🧾 Review</h2>
+          <div class="result-text" id="review-review-text"></div>
+        </div>
+        <div class="result-card accent">
+          <h2 class="result-section-title">🚀 Improvements</h2>
+          <div class="result-text" id="review-improvements-text"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 4. QUIZ PANEL ── -->
+    <section id="panel-quiz" class="panel" role="tabpanel" aria-labelledby="tab-quiz">
+      <div class="panel-header">
+        <h1 class="panel-title">🧠 Quiz Generator</h1>
+        <p class="panel-desc">Enter any topic and get a multiple-choice quiz question with answer and explanation.</p>
+      </div>
+
+      <form class="feature-form" id="quiz-form">
+        <div class="form-group">
+          <label class="form-label" for="quiz-topic">Quiz Topic</label>
+          <input
+            type="text"
+            id="quiz-topic"
+            class="text-input"
+            placeholder="e.g. JavaScript Promises, World History, Photosynthesis…"
+            aria-label="Quiz topic"
+            required
+          />
+        </div>
+        <button type="submit" class="primary-btn" id="quiz-btn">
+          <span class="btn-spinner hidden" aria-hidden="true"></span>
+          <span class="btn-label">Generate Quiz</span>
+        </button>
+      </form>
+
+      <div class="result-area hidden" id="quiz-result">
+        <div class="quiz-card">
+          <div class="quiz-badge">Question</div>
+          <p class="quiz-question" id="quiz-question-text"></p>
+          <div class="quiz-options" id="quiz-options-list"></div>
+          <button class="reveal-btn hidden" id="quiz-reveal-btn">Reveal Answer 🎯</button>
+          <div class="quiz-answer hidden" id="quiz-answer-box">
+            <h3 class="answer-title">✅ Answer &amp; Explanation</h3>
+            <p id="quiz-answer-text"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── TOAST NOTIFICATION ── -->
+  <div class="toast hidden" id="toast" role="alert" aria-live="assertive"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -34,7 +34,7 @@ public class OllamaService {
                 "prompt", fullPrompt,
                 "stream", false);
 
-        String apiEndpoint = ollamaUrl + "/api/generate";
+        String apiEndpoint = ollamaUrl.trim() + "/api/generate";
 
         try {
             log.info("Calling Ollama at {} with model {}", apiEndpoint, ollamaModel);
