@@ -1,0 +1,25 @@
+name: YouChat Backend CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest 
+
+    steps:
+    - name: Step 1 - Get a copy of my code
+      uses: actions/checkout@v4
+
+    - name: Step 2 - Install Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: 'maven'
+
+    - name: Step 3 - Run Maven Build & Tests
+  
+      working-directory: ./youChat
+      run: mvn clean package
