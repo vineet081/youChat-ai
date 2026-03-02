@@ -23,10 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AiController {
 
-    THIS IS A DELIBERATE ERROR TO TEST CI PIPELINE!
-
-
-
     private final OllamaService ollamaService;
 
     // ───────────────────────── 1. Chat ─────────────────────────
