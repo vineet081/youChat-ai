@@ -29,8 +29,7 @@ public class AiController {
 
     @PostMapping("/chat")
     public ResponseEntity<ChatResponse> chat(@RequestBody ChatRequest request) {
-        String systemPrompt = "You are a friendly assistant for daily tips and general conversation";
-        String response = ollamaService.generateResponse(systemPrompt, request.getMessage());
+        String response = ollamaService.chat(request.getSessionId(), request.getMessage());
         return ResponseEntity.ok(new ChatResponse(response));
     }
 

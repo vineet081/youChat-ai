@@ -6,8 +6,8 @@
 const API_BASE = "http://localhost:8080/api";
 
 // ── Tab switching ────────────────────────────────────────
-const tabBtns  = document.querySelectorAll(".tab-btn");
-const panels   = document.querySelectorAll(".panel");
+const tabBtns = document.querySelectorAll(".tab-btn");
+const panels = document.querySelectorAll(".panel");
 
 tabBtns.forEach(btn => {
   btn.addEventListener("click", () => {
@@ -46,7 +46,7 @@ function showToast(msg, color = "#ef4444") {
 // ── Button loading state helpers ─────────────────────────
 function setLoading(btn, isLoading) {
   const spinner = btn.querySelector(".btn-spinner");
-  const label   = btn.querySelector(".btn-label");
+  const label = btn.querySelector(".btn-label");
   if (isLoading) {
     btn.disabled = true;
     spinner?.classList.remove("hidden");
@@ -74,10 +74,14 @@ async function postAPI(endpoint, body) {
 // ════════════════════════════════════════════════════════
 // 1. CHAT
 // ════════════════════════════════════════════════════════
-const chatForm    = document.getElementById("chat-form");
-const chatInput   = document.getElementById("chat-input");
-const chatWindow  = document.getElementById("chat-window");
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const chatWindow = document.getElementById("chat-window");
 const chatSendBtn = document.getElementById("chat-send-btn");
+
+// Unique session ID for this browser session — backend uses this to load/save
+// history in PostgreSQL. Stays the same for the whole page session.
+const sessionId = crypto.randomUUID();
 
 function appendBubble(text, role) {
   // Clear welcome message on first real bubble
@@ -125,19 +129,21 @@ chatForm.addEventListener("submit", async (e) => {
   appendBubble(message, "user");
 
   chatSendBtn.disabled = true;
-  chatInput.disabled   = true;
+  chatInput.disabled = true;
   showTypingIndicator();
 
   try {
-    const data = await postAPI("/chat", { message });
+    // Send message + sessionId — backend loads/saves history in PostgreSQL
+    const data = await postAPI("/chat", { message, sessionId });
     removeTypingIndicator();
-    appendBubble(data.response || data.message || JSON.stringify(data), "ai");
+    const aiText = data.response || data.message || JSON.stringify(data);
+    appendBubble(aiText, "ai");
   } catch (err) {
     removeTypingIndicator();
     showToast("⚠️ " + err.message);
   } finally {
     chatSendBtn.disabled = false;
-    chatInput.disabled   = false;
+    chatInput.disabled = false;
     chatInput.focus();
   }
 });
@@ -153,10 +159,10 @@ chatInput.addEventListener("keydown", (e) => {
 // ════════════════════════════════════════════════════════
 // 2. SUMMARIZE
 // ════════════════════════════════════════════════════════
-const summarizeForm        = document.getElementById("summarize-form");
-const summarizeNotes       = document.getElementById("summarize-notes");
-const summarizeBtn         = document.getElementById("summarize-btn");
-const summarizeResult      = document.getElementById("summarize-result");
+const summarizeForm = document.getElementById("summarize-form");
+const summarizeNotes = document.getElementById("summarize-notes");
+const summarizeBtn = document.getElementById("summarize-btn");
+const summarizeResult = document.getElementById("summarize-result");
 const summarizeSummaryText = document.getElementById("summarize-summary-text");
 const summarizeSuggestText = document.getElementById("summarize-suggestions-text");
 
@@ -171,7 +177,7 @@ summarizeForm.addEventListener("submit", async (e) => {
 
   try {
     const data = await postAPI("/summarize", { notes });
-    summarizeSummaryText.textContent = data.summary   || "(No summary returned)";
+    summarizeSummaryText.textContent = data.summary || "(No summary returned)";
     summarizeSuggestText.textContent = data.suggestions || "(No suggestions returned)";
     summarizeResult.classList.remove("hidden");
     summarizeResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -186,21 +192,21 @@ summarizeForm.addEventListener("submit", async (e) => {
 // ════════════════════════════════════════════════════════
 // 3. CODE REVIEW
 // ════════════════════════════════════════════════════════
-const reviewForm        = document.getElementById("review-form");
-const reviewLanguage    = document.getElementById("review-language");
-const reviewCode        = document.getElementById("review-code");
-const reviewBtn         = document.getElementById("review-btn");
-const reviewResult      = document.getElementById("review-result");
-const reviewReviewText  = document.getElementById("review-review-text");
+const reviewForm = document.getElementById("review-form");
+const reviewLanguage = document.getElementById("review-language");
+const reviewCode = document.getElementById("review-code");
+const reviewBtn = document.getElementById("review-btn");
+const reviewResult = document.getElementById("review-result");
+const reviewReviewText = document.getElementById("review-review-text");
 const reviewImproveText = document.getElementById("review-improvements-text");
 
 reviewForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const language = reviewLanguage.value;
-  const code     = reviewCode.value.trim();
+  const code = reviewCode.value.trim();
 
   if (!language) { showToast("Please select a programming language."); return; }
-  if (!code)     { showToast("Please paste some code to review."); return; }
+  if (!code) { showToast("Please paste some code to review."); return; }
 
   const origLabel = reviewBtn.querySelector(".btn-label").textContent;
   setLoading(reviewBtn, true);
@@ -208,7 +214,7 @@ reviewForm.addEventListener("submit", async (e) => {
 
   try {
     const data = await postAPI("/review-code", { code, language });
-    reviewReviewText.textContent  = data.review       || "(No review returned)";
+    reviewReviewText.textContent = data.review || "(No review returned)";
     reviewImproveText.textContent = data.improvements || "(No improvements returned)";
     reviewResult.classList.remove("hidden");
     reviewResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -223,14 +229,14 @@ reviewForm.addEventListener("submit", async (e) => {
 // ════════════════════════════════════════════════════════
 // 4. QUIZ
 // ════════════════════════════════════════════════════════
-const quizForm       = document.getElementById("quiz-form");
-const quizTopic      = document.getElementById("quiz-topic");
-const quizBtn        = document.getElementById("quiz-btn");
-const quizResult     = document.getElementById("quiz-result");
+const quizForm = document.getElementById("quiz-form");
+const quizTopic = document.getElementById("quiz-topic");
+const quizBtn = document.getElementById("quiz-btn");
+const quizResult = document.getElementById("quiz-result");
 const quizQuestionEl = document.getElementById("quiz-question-text");
-const quizOptionsList= document.getElementById("quiz-options-list");
-const quizRevealBtn  = document.getElementById("quiz-reveal-btn");
-const quizAnswerBox  = document.getElementById("quiz-answer-box");
+const quizOptionsList = document.getElementById("quiz-options-list");
+const quizRevealBtn = document.getElementById("quiz-reveal-btn");
+const quizAnswerBox = document.getElementById("quiz-answer-box");
 const quizAnswerText = document.getElementById("quiz-answer-text");
 
 /** Parse the options string from the AI into an array of { letter, text } */
@@ -245,7 +251,7 @@ function parseOptions(optionsRaw) {
       options.push({ letter: match[1].toUpperCase(), text: match[2].trim() });
     } else if (line.length > 0 && options.length < 4) {
       // fallback: just use the raw line
-      const letters = ["A","B","C","D"];
+      const letters = ["A", "B", "C", "D"];
       options.push({ letter: letters[options.length], text: line });
     }
   }
@@ -282,10 +288,10 @@ quizForm.addEventListener("submit", async (e) => {
           // Highlight selected option
           document.querySelectorAll(".quiz-option-btn").forEach(b => {
             b.style.borderColor = "";
-            b.style.background  = "";
+            b.style.background = "";
           });
           btn.style.borderColor = "var(--accent-1)";
-          btn.style.background  = "rgba(124,58,237,0.18)";
+          btn.style.background = "rgba(124,58,237,0.18)";
         });
         quizOptionsList.appendChild(btn);
       });
